@@ -1,0 +1,44 @@
+{
+  "name": "elimiter",
+  "version": "0.1.0",
+  "description": "easy node rate limiter",
+  "keywords": [
+    "rate-limiter",
+    "ratelimit"
+  ],
+  "author": "YourtionGuo <yourtion@gmail.com>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typing": "dist/index.d.ts",
+  "files": [
+    "dist/index.d.ts",
+    "dist/index.js"
+  ],
+  "scripts": {
+    "pretest": "npm run lint && tsc",
+    "tag": "git tag v`node -p 'require(\"./package\").version'`",
+    "lint": "prettier --write src/**/*.ts",
+    "clean": "rm -rf dist",
+    "compile": "tsc",
+    "prepublishOnly": "npm run clean && npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourtion/node-elimiter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourtion/node-elimiter/issues"
+  },
+  "homepage": "https://github.com/yourtion/node-elimiter#readme",
+  "devDependencies": {
+    "@types/ioredis": "^3.2.13",
+    "@types/jest": "^23.3.0",
+    "ioredis": "^3.2.2",
+    "jest": "^23.4.1",
+    "ts-jest": "^23.0.1",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "@types/node": "^10.5.3"
+  }
+}
