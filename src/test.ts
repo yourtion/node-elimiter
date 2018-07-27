@@ -23,6 +23,7 @@ describe("Limiter", async function() {
 
   describe(".total", async function() {
     it("should represent the total limit per reset period", async function() {
+      expect.assertions(1);
       const limit = new Limiter(db, "something", { max: 5 });
       const res = await limit.get();
       expect(res.total).toEqual(5);
@@ -31,6 +32,7 @@ describe("Limiter", async function() {
 
   describe(".remaining", async function() {
     it("should represent the number of requests remaining in the reset period", async function() {
+      expect.assertions(3);
       const limit = new Limiter(db, "something", { max: 5, duration: 100000 });
       let res = await limit.get();
       expect(res.remaining).toEqual(5);
@@ -45,6 +47,7 @@ describe("Limiter", async function() {
 
   describe(".reset", async function() {
     it("should represent the next reset time in UTC epoch seconds", async function() {
+      expect.assertions(2);
       const limit = new Limiter(db, "something", { max: 5, duration: 60000 });
       const res = await limit.get();
       const left = res.reset - Date.now() / 1000;
@@ -55,6 +58,7 @@ describe("Limiter", async function() {
 
   describe(".resetMs", async function() {
     it("should represent the next reset time in UTC epoch milliseconds", async function() {
+      expect.assertions(3);
       const limit = new Limiter(db, "something", { max: 5, duration: 60000 });
       const res = await limit.get();
       const left = res.resetMs - Date.now();
@@ -66,6 +70,7 @@ describe("Limiter", async function() {
 
   describe("when the limit is exceeded", async function() {
     it("should retain .remaining at 0", async function() {
+      expect.assertions(3);
       const limit = new Limiter(db, "something", { max: 2 });
       let res = await limit.get();
       expect(res.remaining).toEqual(2);
@@ -98,6 +103,7 @@ describe("Limiter", async function() {
 
   describe("when multiple successive calls are made", async function() {
     it("the next calls should not create again the limiter in Redis", async function() {
+      expect.assertions(2);
       const limit = new Limiter(db, "something", { max: 2, duration: 10000 });
       const res1q = limit.get();
       const res2q = limit.get();
@@ -107,6 +113,7 @@ describe("Limiter", async function() {
     });
 
     it("updating the count should keep all TTLs in sync", async function() {
+      expect.assertions(2);
       const limit = new Limiter(db, "something", { max: 2, duration: 10000 });
       limit.get(); // All good here.
       await limit.get();
@@ -126,6 +133,7 @@ describe("Limiter", async function() {
 
   describe("when trying to decrease before setting value", async function() {
     it("should create with ttl when trying to decrease", async function() {
+      expect.assertions(3);
       const limit = new Limiter(db, "something", { max: 2, duration: 10000 });
       await db.set("limit:something:count", 1);
       let res = await limit.get();
@@ -150,6 +158,8 @@ describe("Limiter", async function() {
     }
 
     it("should prevent race condition and properly set the expected value", function(done) {
+      expect.assertions(2 * clientsCount - max + 2);
+
       const responses: IResult[] = [];
 
       function complete() {
@@ -190,6 +200,8 @@ describe("Limiter", async function() {
     const limiter = new Limiter(db2, "asyncsomething", { max, duration: 10000 });
 
     it("should set the count properly without race conditions", async function() {
+      expect.assertions(max + 1);
+
       const arr = [];
       for (let i = 0; i <= max; i++) {
         arr.push(limiter.get());
@@ -204,6 +216,7 @@ describe("Limiter", async function() {
 
   describe("test acquire", async function() {
     it("simple acquire", async function() {
+      expect.assertions(3);
       const limit = new Limiter(db, "something", { max: 2, duration: 10000 });
       const [res1, res2, res3] = await Promise.all([limit.acquire(), limit.acquire(), limit.acquire()]);
       expect(res1).toBe(true);
@@ -212,6 +225,7 @@ describe("Limiter", async function() {
     });
 
     it("race acquire (new client get counter slower)", async function() {
+      expect.assertions(3);
       const limit = new Limiter(db, "something", { max: 2, duration: 10000 });
       const db2 = new Redis();
       const [res1, res2, res3] = await Promise.all([
