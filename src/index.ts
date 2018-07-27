@@ -9,23 +9,37 @@ function microtime() {
 }
 
 export interface IOpt {
+  /** 限流标识 */
   id?: string;
+  /** 限流数量 */
   max?: number;
+  /** 时间窗口（ms） */
   duration?: number;
 }
 
 export interface IOptions extends IOpt {
+  /** 限流标识 */
+  id: string;
+  /** 限流器前缀（默认 limit） */
   namespace?: string;
 }
 
 export interface IResult {
+  /** 当前时间总数 */
   count: number;
+  /** 剩余数量 */
   remaining: number;
+  /** 重置时间（s） */
   reset: number;
+  /** 重置时间（ms */
   resetMs: number;
+  /** 总数量 */
   total: number;
 }
 
+/**
+ * 分布式限流
+ */
 export default class ELimiter {
   private db: any;
   private id: string;
@@ -33,6 +47,11 @@ export default class ELimiter {
   private duration: number;
   private namespace: string;
 
+  /**
+   * 初始化限流器
+   * @param db IORedis 实例
+   * @param opts 参数
+   */
   constructor(db: any, opts: IOptions) {
     this.id = opts.id || "";
     this.db = db;
@@ -47,8 +66,18 @@ export default class ELimiter {
     return `<Limiter id="${this.id}" duration=${this.duration} max=${this.max} />`;
   }
 
+  /**
+   * 获取限流参数
+   * @param id 限流标识（用户id、ip地址...)
+   */
   get(id?: string): Promise<IResult>;
+
+  /**
+   * 获取限流参数
+   * @param opt 限流参数
+   */
   get(opt?: IOpt): Promise<IResult>;
+
   get(arg: string | IOpt = {}): Promise<IResult> {
     const id = (typeof arg === "string" ? arg : arg.id) || this.id;
     const max = (typeof arg !== "string" && arg.max) || this.max;
