@@ -4,12 +4,11 @@ addons:
   sonarcloud:
     organization: "yourtion-github"
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      if [ "$TRAVIS_NODE_VERSION" = '10' ]; then
-        npm run test:cov && sonar-scanner;
-      fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_NODE_VERSION" = '10' && "$TRAVIS_BRANCH" = "master" ]]; then
+      npm run test:cov && sonar-scanner;
     fi
   - npm run test
+
 
 services:
   - redis-server
