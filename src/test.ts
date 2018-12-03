@@ -25,6 +25,7 @@ describe("Limiter", async function() {
     it("should represent the total limit per reset period", async function() {
       expect.assertions(1);
       const limit = new Limiter(db, { id: "something", max: 5 });
+      console.log(limit)
       const res = await limit.get();
       expect(res.total).toEqual(5);
     });
