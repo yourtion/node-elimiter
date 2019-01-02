@@ -25,7 +25,7 @@ describe("Limiter", async function() {
     it("should represent the total limit per reset period", async function() {
       expect.assertions(1);
       const limit = new Limiter(db, { id: "something", max: 5 });
-      console.log(limit)
+      console.log(limit);
       const res = await limit.get();
       expect(res.total).toEqual(5);
     });
@@ -50,8 +50,8 @@ describe("Limiter", async function() {
     it("should represent the next reset time in UTC epoch seconds", async function() {
       expect.assertions(2);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 60000 });
-      const res = await limit.get();
-      const left = res.reset - Date.now() / 1000;
+      const res = await limit.get({ rest: true });
+      const left = res.reset! - Date.now() / 1000;
       expect(left).toBeGreaterThan(0);
       expect(left).toBeLessThan(60);
     });
@@ -61,8 +61,8 @@ describe("Limiter", async function() {
     it("should represent the next reset time in UTC epoch milliseconds", async function() {
       expect.assertions(3);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 60000 });
-      const res = await limit.get();
-      const left = res.resetMs - Date.now();
+      const res = await limit.get({ rest: true });
+      const left = res.resetMs! - Date.now();
       expect(Number.isInteger(left)).toBe(true);
       expect(left).toBeGreaterThan(0);
       expect(left).toBeLessThanOrEqual(60000);
@@ -95,9 +95,9 @@ describe("Limiter", async function() {
       expect(res.remaining).toEqual(1);
 
       await sleep(110);
-      res = await limit.get();
+      res = await limit.get({ rest: true });
       expect(res.remaining).toEqual(2);
-      var left = res.reset - Date.now() / 1000;
+      var left = res.reset! - Date.now() / 1000;
       expect(left).toBeLessThan(2);
     });
   });
@@ -268,9 +268,9 @@ describe("Limiter", async function() {
       expect.assertions(2);
       const limit = new Limiter(db, { id: "something", max: 5 });
 
-      const res = await limit.get({ duration: 10000 });
+      const res = await limit.get({ duration: 10000, rest: true });
       expect(res.remaining).toEqual(5);
-      const left = res.reset - Date.now() / 1000;
+      const left = res.reset! - Date.now() / 1000;
       expect(left).toBeLessThan(10);
     });
 
@@ -278,14 +278,14 @@ describe("Limiter", async function() {
       expect.assertions(5);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 25000 });
 
-      let res = await limit.get({ duration: 10000 });
+      let res = await limit.get({ duration: 10000, rest: true });
       expect(res.remaining).toEqual(5);
-      let left = res.reset - Date.now() / 1000;
+      let left = res.reset! - Date.now() / 1000;
       expect(left).toBeLessThan(10);
 
-      res = await limit.get();
+      res = await limit.get({ rest: true });
       expect(res.remaining).toEqual(4);
-      left = res.reset - Date.now() / 1000;
+      left = res.reset! - Date.now() / 1000;
       expect(left).toBeLessThan(25);
       expect(left).toBeGreaterThan(10);
     });
