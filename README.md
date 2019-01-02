@@ -44,3 +44,12 @@ const res = await limit.get(); // limit.get(req.ip), limit(userid)
 if(res.remaining < 1) throw new Errror("out of limit");
 // continue
 ```
+
+```typescript
+// Get with reset and resetMs
+const res = await limit.get({ reset: true });
+console.log(res)
+// { count: 0, remaining: 5, total: 5, reset: 1546438588, resetMs: 1546438588062 }
+if(res.remaining < 1) throw new Errror("out of limit");
+// continue
+```

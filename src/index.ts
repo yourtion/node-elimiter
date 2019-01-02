@@ -15,6 +15,8 @@ export interface IOpt {
   max?: number;
   /** 时间窗口（ms） */
   duration?: number;
+  /** 是否需要重置时间信息 */
+  reset?: boolean;
 }
 
 export interface IOptions extends IOpt {
@@ -30,9 +32,9 @@ export interface IResult {
   /** 剩余数量 */
   remaining: number;
   /** 重置时间（s） */
-  reset: number;
+  reset?: number;
   /** 重置时间（ms */
-  resetMs: number;
+  resetMs?: number;
   /** 总数量 */
   total: number;
 }
@@ -82,30 +84,33 @@ export default class ELimiter {
     const id = (typeof arg === "string" ? arg : arg.id) || this.id;
     const max = (typeof arg !== "string" && arg.max) || this.max;
     const duration = (typeof arg !== "string" && arg.duration) || this.duration;
+    const reset = typeof arg !== "string" && arg.reset;
     assert(id, "id required");
     assert(max, "max required");
     assert(duration, "duration required");
     const key = `${this.namespace}:${id}`;
     const now = microtime();
     const start = now - duration * 1000;
-    return this.db
+    const req = this.db
       .multi()
       .zremrangebyscore(key, 0, start)
       .zcard(key)
-      .zadd(key, String(now), String(now))
-      .zrange(key, 0, 0)
-      .pexpire(key, duration)
-      .exec()
-      .then((res: any[]) => {
-        const count = parseInt(res[1][1]);
+      .zadd(key, String(now), String(now));
+    if (reset) req.zrange(key, 0, 0);
+    req.pexpire(key, duration);
+    return req.exec().then((res: any[]) => {
+      const count = parseInt(res[1][1]);
+      const result: IResult = {
+        count,
+        remaining: count < max ? max - count : 0,
+        total: max,
+      };
+      if (reset) {
         const oldest = parseInt(res[3][1]);
-        return {
-          count,
-          remaining: count < max ? max - count : 0,
-          reset: Math.floor((oldest + duration * 1000) / 1000000),
-          resetMs: Math.floor((oldest + duration * 1000) / 1000),
-          total: max,
-        };
-      });
+        result.reset = Math.floor((oldest + duration * 1000) / 1000000);
+        result.resetMs = Math.floor((oldest + duration * 1000) / 1000);
+      }
+      return result;
+    });
   }
 }
