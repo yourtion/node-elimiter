@@ -41,15 +41,30 @@ const db = new Redis();
 const limiter = new Limiter(db, { id: "ip", max: 5, duration: 60 * 1000 });
 
 const res = await limit.get(); // limit.get(req.ip), limit(userid)
-if(res.remaining < 1) throw new Errror("out of limit");
+if (res.remaining < 1) throw new Errror("out of limit");
 // continue
 ```
 
 ```typescript
 // Get with reset and resetMs
 const res = await limit.get({ reset: true });
-console.log(res)
+console.log(res);
 // { count: 0, remaining: 5, total: 5, reset: 1546438588, resetMs: 1546438588062 }
-if(res.remaining < 1) throw new Errror("out of limit");
+if (res.remaining < 1) throw new Errror("out of limit");
 // continue
 ```
+
+## Benchmark
+
+Platform info:
+
+- Linux 4.4.0-101-generic x64
+- Node.JS: 10.15.0
+- V8: 6.8.275.32-node.45
+  Intel(R) Xeon(R) CPU @ 2.30GHz × 2
+
+3 tests success:
+| test | rps |  ns/op | spent |
+| --- | --- | --- | --- |
+| `limit.get({ reset: true })` | 10172.0 | 98309.4 | 2.012s |
+| `limit.get()` | 11529.1 | 86736.9 | 2.009s |
