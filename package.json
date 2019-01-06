@@ -19,9 +19,9 @@
     "test:cov": "jest --coverage",
     "tag": "git tag v`node -p 'require(\"./package\").version'`",
     "format": "prettier --write \"src/**/*.ts\"",
-    "clean": "rm -rf dist",
-    "compile": "tsc",
-    "prepublishOnly": "npm run format && npm run clean && npm run test:cov && cat ./coverage/lcov.info | coveralls",
+    "compile": "rm -rf dist && tsc",
+    "benchmark": "npm run compile && node dist/benchmark.js ",
+    "prepublishOnly": "npm run format && npm run compile && npm run test:cov && cat ./coverage/lcov.info | coveralls",
     "postpublish": "npm run tag && git push && git push --tags"
   },
   "repository": {
@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/yourtion/node-elimiter#readme",
   "devDependencies": {
+    "@leizm/benchmark": "^1.0.0",
     "@types/ioredis": "^3.2.13",
     "@types/jest": "^23.3.0",
     "@types/node": "^10.12.11",
