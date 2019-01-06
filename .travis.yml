@@ -5,7 +5,7 @@ addons:
     organization: "yourtion-github"
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_NODE_VERSION" = '10' && "$TRAVIS_BRANCH" = "master" ]]; then
-      npm run test:cov && sonar-scanner;
+      npm run test:cov && sonar-scanner && npm run benchmark;
     fi
   - npm run test
 
