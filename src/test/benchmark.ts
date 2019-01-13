@@ -1,4 +1,4 @@
-import Limiter from "./";
+import Limiter from "../lib";
 
 import Benchmark from "@leizm/benchmark";
 import Redis from "ioredis";

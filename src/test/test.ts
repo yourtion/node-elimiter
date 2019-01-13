@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import Limiter, { IResult } from "./";
+import Limiter, { IResult } from "../lib";
 
 function sleep(time: number) {
   return new Promise(resolve => {

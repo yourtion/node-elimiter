@@ -8,11 +8,11 @@
   ],
   "author": "YourtionGuo <yourtion@gmail.com>",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typing": "dist/index.d.ts",
+  "main": "dist/lib/index.js",
+  "typing": "dist/lib/index.d.ts",
   "files": [
-    "dist/index.d.ts",
-    "dist/index.js"
+    "lib/*.d.ts",
+    "lib/*.js"
   ],
   "scripts": {
     "test": "jest",
@@ -20,7 +20,7 @@
     "tag": "git tag v`node -p 'require(\"./package\").version'`",
     "format": "prettier --write \"src/**/*.ts\"",
     "compile": "rm -rf dist && tsc",
-    "benchmark": "npm run compile && node dist/benchmark.js ",
+    "benchmark": "npm run compile && node dist/test/benchmark.js ",
     "prepublishOnly": "npm run format && npm run compile && npm run test:cov && cat ./coverage/lcov.info | coveralls",
     "postpublish": "npm run tag && git push && git push --tags"
   },
@@ -51,9 +51,9 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "./src/test",
+    "testRegex": "./src/test/test.ts",
     "collectCoverageFrom": [
-      "src/index.ts"
+      "src/lib/*.ts"
     ],
     "coverageThreshold": {
       "global": {
