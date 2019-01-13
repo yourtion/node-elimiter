@@ -59,11 +59,12 @@ describe("Limiter", async function() {
 
   describe(".resetMs", async function() {
     it("should represent the next reset time in UTC epoch milliseconds", async function() {
-      expect.assertions(3);
+      expect.assertions(4);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 60000 });
       const res = await limit.get({ reset: true });
       const left = res.resetMs! - Date.now();
       expect(Number.isInteger(left)).toBe(true);
+      expect(res.ok).toBeTruthy();
       expect(left).toBeGreaterThan(0);
       expect(left).toBeLessThanOrEqual(60000);
     });
@@ -71,15 +72,18 @@ describe("Limiter", async function() {
 
   describe("when the limit is exceeded", async function() {
     it("should retain .remaining at 0", async function() {
-      expect.assertions(3);
+      expect.assertions(6);
       const limit = new Limiter(db, { id: "something", max: 2 });
       let res = await limit.get();
       expect(res.remaining).toEqual(2);
+      expect(res.ok).toBeTruthy();
       res = await limit.get();
       expect(res.remaining).toEqual(1);
+      expect(res.ok).toBeTruthy();
       res = await limit.get();
       // function caller should reject this call
       expect(res.remaining).toEqual(0);
+      expect(res.ok).toBeFalsy();
     });
   });
 

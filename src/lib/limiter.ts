@@ -27,6 +27,8 @@ export interface IOptions extends IOpt {
 }
 
 export interface IResult {
+  /** 是否超过 max */
+  ok: boolean;
   /** 当前时间总数 */
   count: number;
   /** 剩余数量 */
@@ -65,7 +67,7 @@ export default class ELimiter {
   }
 
   [util.inspect.custom]() {
-    return `<Limiter id="${this.id}" duration=${this.duration} max=${this.max} />`;
+    return `<ELimiter id="${this.id}" duration=${this.duration} max=${this.max} />`;
   }
 
   /**
@@ -85,12 +87,11 @@ export default class ELimiter {
     const max = (typeof arg !== "string" && arg.max) || this.max;
     const duration = (typeof arg !== "string" && arg.duration) || this.duration;
     const reset = typeof arg !== "string" && arg.reset;
-    assert(id, "id required");
-    assert(max, "max required");
-    assert(duration, "duration required");
+
     const key = `${this.namespace}:${id}`;
     const now = microtime();
     const start = now - duration * 1000;
+
     const req = this.db
       .multi()
       .zremrangebyscore(key, 0, start)
@@ -98,9 +99,11 @@ export default class ELimiter {
       .zadd(key, String(now), String(now));
     if (reset) req.zrange(key, 0, 0);
     req.pexpire(key, duration);
+
     return req.exec().then((res: any[]) => {
       const count = parseInt(res[1][1]);
       const result: IResult = {
+        ok: count < max,
         count,
         remaining: count < max ? max - count : 0,
         total: max,
