@@ -64,6 +64,7 @@ Platform info:
   Intel(R) Xeon(R) CPU @ 2.30GHz × 2
 
 3 tests success:
+
 | test | rps |  ns/op | spent |
 | --- | --- | --- | --- |
 | `limit.get({ reset: true })` | 10172.0 | 98309.4 | 2.012s |
