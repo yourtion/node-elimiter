@@ -7,7 +7,7 @@ function sleep(time: number) {
   });
 }
 
-describe("Limiter", async function() {
+describe("Limiter", function() {
   const db = new Redis();
 
   beforeEach(async function() {
@@ -21,7 +21,7 @@ describe("Limiter", async function() {
     db.disconnect();
   });
 
-  describe(".total", async function() {
+  describe(".total", function() {
     it("should represent the total limit per reset period", async function() {
       expect.assertions(1);
       const limit = new Limiter(db, { id: "something", max: 5 });
@@ -31,7 +31,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe(".remaining", async function() {
+  describe(".remaining", function() {
     it("should represent the number of requests remaining in the reset period", async function() {
       expect.assertions(3);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 100000 });
@@ -46,7 +46,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe(".reset", async function() {
+  describe(".reset", function() {
     it("should represent the next reset time in UTC epoch seconds", async function() {
       expect.assertions(2);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 60000 });
@@ -57,7 +57,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe(".resetMs", async function() {
+  describe(".resetMs", function() {
     it("should represent the next reset time in UTC epoch milliseconds", async function() {
       expect.assertions(4);
       const limit = new Limiter(db, { id: "something", max: 5, duration: 60000 });
@@ -70,7 +70,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe("when the limit is exceeded", async function() {
+  describe("when the limit is exceeded", function() {
     it("should retain .remaining at 0", async function() {
       expect.assertions(6);
       const limit = new Limiter(db, { id: "something", max: 2 });
@@ -87,7 +87,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe("when the duration is exceeded", async function() {
+  describe("when the duration is exceeded", function() {
     it("should reset", async function() {
       expect.assertions(4);
       const limit = new Limiter(db, { id: "something", max: 2, duration: 100 });
@@ -106,7 +106,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe("when multiple successive calls are made", async function() {
+  describe("when multiple successive calls are made", function() {
     it("the next calls should not create again the limiter in Redis", async function() {
       expect.assertions(2);
       const limit = new Limiter(db, { id: "something", max: 2, duration: 10000 });
@@ -136,7 +136,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe("when trying to decrease before setting value", async function() {
+  describe("when trying to decrease before setting value", function() {
     it("should create with ttl when trying to decrease", async function() {
       expect.assertions(3);
       const limit = new Limiter(db, { id: "something", max: 2, duration: 10000 });
@@ -150,7 +150,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe("when multiple concurrent clients modify the limit", async function() {
+  describe("when multiple concurrent clients modify the limit", function() {
     const clientsCount = 7;
     const max = 5;
     let left = max;
@@ -199,7 +199,7 @@ describe("Limiter", async function() {
     });
   });
 
-  describe("when limiter is called in parallel by multiple clients", async function() {
+  describe("when limiter is called in parallel by multiple clients", function() {
     let max = 6;
     const db2 = new Redis();
     const limiter = new Limiter(db2, { id: "asyncsomething", max, duration: 10000 });
